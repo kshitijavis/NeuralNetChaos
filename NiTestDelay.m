@@ -1,6 +1,17 @@
 function NiTestDelay(sourceFile, netName)
 close all
 
+%{
+Plots approx. 30 cycles of sourceFile and network-predicted data.
+Note that this function plots the difference between adjacent data points
+(delta), rather than the true data, in order to yeild a more accurate
+network prediction. The value of delta is specified by the variable "tau",
+which is measured in seconds.
+
+Accuracy is analyzed using linear regression and mean-squred error (MSE)
+These values are printed at the end of this function
+%}
+
 %path to access source file and network
 sourceFile = fullfile(pwd, 'Network Chaos Data', sourceFile);
 netName = fullfile(pwd, 'Saved Series Nets', netName);

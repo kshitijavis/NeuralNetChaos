@@ -1,8 +1,17 @@
-function net = NiTrainDelay(filename, netName)
+function net = NiTrainDelay(sourceFile, netName)
 close all
 
-%variables to consider: hiddenNetworks,
-%fracTrain, numIn,startTest,lengthTest
+%{
+Trains firnet neural network to predict the difference between data points
+(delta), with current measured in amperes. Basic training parameters can be
+set below. Parameters to consider: hiddenNetworks, fracTrain,numIn,startTest, 
+and lengthTest
+%}
+
+%path to source file and to Saved Series Nets directory
+sourceFile = fullfile(pwd, 'Network Chaos Data', sourceFile);
+netDirectory = fullfile(pwd, 'Saved Series Nets');
+
 %set training data parameters
 numHid = 15;
 trainFunc = 'trainbr';
@@ -13,7 +22,7 @@ fracTrain = 1/4;  %fraction of data being used to train
 startTrain = 1;
 
 %load file to analyze. Filter and normalize data
-new_map = load(filename); 
+new_map = load(sourceFile); 
 data = new_map;
 xfiltData = sgolayfilt(data,2,21);
 xStdData = (xfiltData - mean(xfiltData))/std(xfiltData);
@@ -49,4 +58,4 @@ net.trainParam.min_grad = minGrad;
 net = train(net,xInput,dOutput);
 
 %save the network
-save(netName,'net');
+save(fullfile(netDirectory,netName),'net');

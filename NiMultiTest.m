@@ -1,6 +1,12 @@
 function xPrediction = NiMultiTest(sourceFile, netName)
 close all
 
+%{
+Creates live plot of network predicted data
+Plots both the true data and delta (the difference between adjacent data
+points)
+%}
+
 %path to access source file and network
 sourceFile = fullfile(pwd, 'Network Chaos Data', sourceFile);
 netName = fullfile(pwd, 'Saved Series Nets', netName);
