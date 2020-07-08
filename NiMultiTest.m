@@ -1,5 +1,9 @@
-function xPrediction = NiMultiTest(filename, netName)
+function xPrediction = NiMultiTest(sourceFile, netName)
 close all
+
+%path to access source file and network
+sourceFile = fullfile(pwd, 'Network Chaos Data', sourceFile);
+netName = fullfile(pwd, 'Saved Series Nets', netName);
 
 %variables to consider: tau, startTest, lengthTest
 tau = 27;
@@ -9,7 +13,7 @@ initLength = 200;
 rowTest = 1;
 
 %load file to analyze. Filter and normalize data
-new_map = load(filename); 
+new_map = load(sourceFile); 
 data = new_map;
 xfiltData = sgolayfilt(data,2,21);
 xMean = mean(xfiltData);

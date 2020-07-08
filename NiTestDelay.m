@@ -5,7 +5,6 @@ close all
 sourceFile = fullfile(pwd, 'Network Chaos Data', sourceFile);
 netName = fullfile(pwd, 'Saved Series Nets', netName);
 
-
 %load file to analyze. Filter and normalize data
 newMap = load(sourceFile); 
 xfiltData = sgolayfilt(newMap,2,25);
@@ -21,9 +20,14 @@ numIn = net.inputs{1}.size;
 %variables to consider: tau, startTest, lengthTest
 tau = 27;
 random = rand / 2;
-startTest = floor(length(xStdData)*rand);
+startTest = floor(length(xStdData)*random);
 rowTest = 2;
 
+%determine length of test
+[~, locs] = findpeaks(xStdData, 'MinPeakDistance', 70);
+numCycles = 30;
+%testLength = length(xStdData) - startTest - (numIn * tau);
+testLength = numCycles * (locs(2) - locs(1));
 
 %create delta map as target output
 x2Data = xfiltData (2:end);
@@ -45,20 +49,10 @@ end
 %use network to make prediction
 dPrediction = net(xInput);
 
-%rescale data
-xInput = xInput * std(xfiltData) + mean(xfiltData);
-%dOutput = dOutput * std(dData) + mean(dData);
-%dPrediction = dPrediction * std(dData) + mean(dData);
-
-%determine length of test
-numCycles = 30;
-cycleLength 
-testLength = length(xStdData) - startTest - (numIn * tau);
-
 dOutput = dOutput(rowTest,:);
 dPrediction = dPrediction(rowTest,:);
-%plots
 
+%plots
 %plot both maps on same graph
 subplot(2,2,[3,4])
 hold on
@@ -66,8 +60,10 @@ plot(dOutput)
 plot(dPrediction)
 title('Predicted and True Current')
 legend('Predicted','True')
+xlabel('Time (s)')
+xlim([0 testLength])
 
-%plot the testing logistic map
+%plot error
 subplot(2,2,1)
 %figure
 plot(dPrediction - dOutput,'.','MarkerSize',.02)
@@ -75,9 +71,8 @@ ylabel('Error (Predicted - Target) in Current (A)')
 xlabel('Time (s)')
 title('Error')
 xlim([0 testLength])
-xticks([])
-xticks(0:10000:testLength)
-xticklabels(0:50:(testLength/200))
+% xticks(0:10000:testLength)
+% xticklabels(0:50:(testLength/200))
 hold off
 
 
@@ -94,5 +89,4 @@ sgtitle('Network Performance')
 %performance
 r = corrcoef(dOutput,dPrediction);
 r = r(2)
-
 MSE = immse(dOutput,dPrediction)
