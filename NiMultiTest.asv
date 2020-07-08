@@ -72,9 +72,7 @@ xPresTrue = xPresTrue';
 xInit = (1:initLength);
 xPres = (initLength:initLength + testLength - 1);
 
-%{
-Used to render a live visualization, commented to speed up prediction
---------------------
+%Used to render a live visualization, commented to speed up prediction
 
 hold on
 subplot(2,1,1)
@@ -109,7 +107,6 @@ while i <= testLength
     %}
     
     %standardize prediction data again
-    
     xPrediction(:,i) = (xPrediction(:,i) - xMean)/xStd;
     i = i + 1;
 end

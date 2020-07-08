@@ -37,7 +37,6 @@ rowTest = 2;
 %determine length of test
 [~, locs] = findpeaks(xStdData, 'MinPeakDistance', 70);
 numCycles = 30;
-%testLength = length(xStdData) - startTest - (numIn * tau);
 testLength = numCycles * (locs(2) - locs(1));
 
 %create delta map as target output
