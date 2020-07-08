@@ -1,22 +1,15 @@
-function NiTestDelay(filename, netName, plotTitle)
+function NiTestDelay(sourceFile, netName)
 close all
 
-%variables to consider: tau, startTest, lengthTest
-tau = 27;
-testLength= 500*200;
-rowTest = 2;
+%path to access source file and network
+sourceFile = fullfile(pwd, 'Network Chaos Data', sourceFile);
+netName = fullfile(pwd, 'Saved Series Nets', netName);
+
 
 %load file to analyze. Filter and normalize data
-new_map = load(filename); 
-data = new_map;
-xfiltData = sgolayfilt(data,2,25);
+newMap = load(sourceFile); 
+xfiltData = sgolayfilt(newMap,2,25);
 xStdData = (xfiltData - mean(xfiltData))/std(xfiltData);
-
-%create delta map as target output
-x2Data = xfiltData (2:end);
-x1Data = xfiltData(1:end-1);
-dStdData = x2Data - x1Data;
-%dStdData = (dData - mean(dData))/std(dData);
 
 %load and extract network from struct
 net = load(netName);
@@ -25,8 +18,17 @@ net = net.(fn{1});
 
 numIn = net.inputs{1}.size;
 
-%data defining parameters
-startTest = floor(length(xStdData)*.57);
+%variables to consider: tau, startTest, lengthTest
+tau = 27;
+random = rand / 2;
+startTest = floor(length(xStdData)*rand);
+rowTest = 2;
+
+
+%create delta map as target output
+x2Data = xfiltData (2:end);
+x1Data = xfiltData(1:end-1);
+dStdData = x2Data - x1Data;
 
 % initialize matrices
 xInput = zeros(numIn,testLength + 1);
@@ -48,20 +50,25 @@ xInput = xInput * std(xfiltData) + mean(xfiltData);
 %dOutput = dOutput * std(dData) + mean(dData);
 %dPrediction = dPrediction * std(dData) + mean(dData);
 
+%determine length of test
+numCycles = 30;
+cycleLength 
+testLength = length(xStdData) - startTest - (numIn * tau);
+
 dOutput = dOutput(rowTest,:);
 dPrediction = dPrediction(rowTest,:);
 %plots
 
 %plot both maps on same graph
-% %subplot(2,2,1)
-% hold on
-% plot(dOutput)
-% plot(dPrediction)
-% title('Predicted and True Current')
-% legend('Predict','True')
+subplot(2,2,[3,4])
+hold on
+plot(dOutput)
+plot(dPrediction)
+title('Predicted and True Current')
+legend('Predicted','True')
 
 %plot the testing logistic map
-subplot(1,2,1)
+subplot(2,2,1)
 %figure
 plot(dPrediction - dOutput,'.','MarkerSize',.02)
 ylabel('Error (Predicted - Target) in Current (A)')
@@ -75,14 +82,14 @@ hold off
 
 
 % %plot actual vs predicted output
-subplot(1,2,2)
+subplot(2,2,2)
 %figure
 plot(dOutput,dPrediction,'.','MarkerSize',.02); 
 xlabel('Target Current (A)')
 ylabel('Network Predicted Current (A)')
 title('Performance Scatterplot')
 
-sgtitle(plotTitle)
+sgtitle('Network Performance')
 
 %performance
 r = corrcoef(dOutput,dPrediction);
